@@ -6,7 +6,7 @@ nav:
 
 asciidoc:
   attributes:
-    lab_name: "Getting started with Ansible development tools in VS code"
+    lab_name: "Getting started with Ansible Navigator"
     release-version: master
     page-pagination: true
     my_var: "foo"
