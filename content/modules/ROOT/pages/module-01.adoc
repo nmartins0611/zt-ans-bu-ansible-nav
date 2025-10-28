@@ -1,47 +1,70 @@
-= Welcome to the Ansible Development Tools Workshop
-:notoc:
-:toc-title: Table of Contents
-:nosectnums:
-:icons: font
+= Lab Guide: Introduction to the ansible-navigator Environment
 
-_A brief introduction to the workshop, including tips for the lab environment._
+_An introduction to the `ansible-navigator` tool and the `code-server` editor environment used in this lab._
 
 ---
 
-== Workshop Overview
+== Introduction
 
-Welcome to the Ansible development tools workshop!
+[`ansible-navigator`](https://github.com/ansible/ansible-navigator) is a textual user interface (TUI) available to Ansible Automation Platform subscribers. Introduced with Ansible Automation Platform 2, it serves as the primary interface for creating and testing Ansible automation. `ansible-navigator` also functions as a drop-in replacement for `ansible-playbook` and other `ansible-*` utilities.
 
-image::un-11-2025_at_17.03.29-image.png[Ansible Development Tools, opts="border"]
+In this lab, you will use `ansible-navigator` from within a web-based code editor environment called [`code-server`](https://github.com/cdr/code-server).
 
-In this lab, you will learn how to create, test, and deploy an Ansible collection using the `ansible-creator` tool, the Visual Studio Code (VS Code) editor, and the official Ansible extension for VS Code.
+NOTE: `code-server` is not packaged with Ansible Automation Platform and is not affiliated with Red Hat.
 
 ---
 
-== Lab Tips
+== Task: Explore the Environment and Run a Test Playbook
 
-Before we begin, here are some basic tips to improve your lab experience:
+Let's get started by opening the integrated terminal and running a few commands.
 
-.   The **instructions sidebar** (where you are reading this) can be resized by dragging its border or can be completely collapsed by clicking the arrow at the top of the sidebar. This is useful if you need extra space for the main panel.
+.   **Open a new terminal.** In the `code-server` interface, go to the top menu and select **Terminal** → **New Terminal**.
 
-.   The lab consists of several **Challenges** (or *Chapters*). Each challenge contains one or more **Tasks**. The sections can be collapsed and expanded by clicking on them.
-+
-image:/image.png[Collapsing and expanding the instructions sidebar, opts="border"]
-
-.   When we refer to the **VS Code** or **VSCode Editor** tab, we mean the tab at the top of the main lab window, not a separate application.
-
-.   Each **code box** in the instructions has a copy feature. Clicking the **Copy** text at the top right of the box will copy the content to your clipboard, which you can then paste into the VS Code terminal or editor.
+.   **Verify `ansible-navigator` installation.** At the terminal prompt, run the following command to quickly test that `ansible-navigator` is installed and view its options:
 +
 [source,bash]
 ----
-$ this is an example code box
+ansible-navigator --help
 ----
 
-.   If you receive any VS Code notification pop-ups, you can safely ignore and dismiss them by clicking `x`, `Dismiss`, or `Ignore`.
+.   **Create a test playbook.** Now that you know `ansible-navigator` is installed, create a simple playbook file named `test.yml` in your home directory (`/home/rhel`). You can do this by right-clicking in the file explorer pane on the left and selecting "New File". Paste the following content into the file:
++
+[source,yaml]
+----
+---
+- name: this is just a test
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: ping test
+      ansible.builtin.ping:
+----
++
+*Save* the file.
 
-.   When you finish a Challenge, you must click the green **Next** or **Check** button at the bottom of the instructions to proceed. The *Check* button will review your work before moving on. Please **click Next now** to continue.
+.   **Run the playbook with `ansible-navigator`.** Now, execute the playbook using `ansible-navigator` in standard output mode (`-m stdout`), which mimics the output style of `ansible-playbook`:
++
+[source,bash]
+----
+ansible-navigator run ./test.yml -m stdout
+----
++
+You should see output similar to this, indicating successful execution against `localhost`:
++
+[source,text]
+----
+[rhel@code-server ~]$ ansible-navigator run ./test.yml -m stdout
 
-[IMPORTANT]
-====
-When you finish the lab, you will reach a review screen. Please take a moment to rate the lab and leave your feedback!
-====
+PLAY [this is just a test] *****************************************************
+
+TASK [ping test] ***************************************************************
+ok: [localhost]
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
+----
+
+---
+== Next Steps
+
+You have successfully verified the environment. Press the `Next` button below to proceed to the next challenge.
