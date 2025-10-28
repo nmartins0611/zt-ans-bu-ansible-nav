@@ -20,32 +20,76 @@ retry "dnf install httpd nano xfsdump -y"
 
 setenforce 0
 
+USER="rhel"
+
+# uninstall old ansible extension
+su - $USER -c 'code-server --uninstall-extension vscoss.vscode-ansible'
+
 systemctl stop firewalld
 systemctl stop code-server
 mv /home/rhel/.config/code-server/config.yaml /home/rhel/.config/code-server/config.bk.yaml
-
 tee /home/rhel/.config/code-server/config.yaml << EOF
 bind-addr: 0.0.0.0:8080
 auth: none
 cert: false
 EOF
 
+# set vscode default settings
+su - $USER -c 'cat >/home/$USER/.local/share/code-server/User/settings.json <<EOL
+{
+    "git.ignoreLegacyWarning": true,
+    "window.menuBarVisibility": "visible",
+    "git.enableSmartCommit": true,
+    "workbench.tips.enabled": false,
+    "workbench.startupEditor": "readme",
+    "telemetry.enableTelemetry": false,
+    "search.smartCase": true,
+    "git.confirmSync": false,
+    "workbench.colorTheme": "Solarized Dark",
+    "update.showReleaseNotes": false,
+    "update.mode": "none",
+    "ansible.ansibleLint.enabled": false,
+    "ansible.ansible.useFullyQualifiedCollectionNames": true,
+    "files.exclude": {
+        "**/.*": true
+    }
+}
+EOL
+cat /home/$USER/.local/share/code-server/User/settings.json'
+
+# set ansible-navigator default settings
+su - $USER -c 'cat >/home/$USER/ansible-navigator.yml <<EOL
+---
+ansible-navigator:
+  execution-environment:
+    container-engine: podman
+    image: ee-supported-rhel8
+    enabled: false
+    pull-policy: never
+
+  playbook-artifact:
+    save-as: /home/rhel/playbook-artifacts/{playbook_name}-artifact-{ts_utc}.json
+
+  logging:
+    level: debug
+
+EOL
+cat /home/$USER/ansible-navigator.yml'
+
+# Creates playbook artifacts dir
+su - $USER -c 'mkdir /home/$USER/playbook-artifacts'
+
+
 systemctl start code-server
 dnf install unzip nano git podman -y 
-
 ## Configure sudoers for rhel user
 echo "%rhel ALL=(ALL:ALL) NOPASSWD:ALL" > /etc/sudoers.d/rhel_sudoers
 chmod 440 /etc/sudoers.d/rhel_sudoers
-#!/bin/bash
 
 ## Set up error handling and DNS resolution
 set -euxo pipefail
 sudo dnf -y install jq
 sudo dnf -y update crun
-
-
-## Temporary SELinux enforcement setting disable
-setenforce 0
 
 ## Define variables
 USER="rhel"
@@ -77,10 +121,6 @@ fi
 ## Environment variables for rhel user
 echo 'export PATH=$HOME/.local/bin:$PATH' >> /home/$USER/.profile
 chown $USER:$USER /home/$USER/.profile
-
-## Set SELinux booleans and start Nginx
-#setsebool -P httpd_can_network_connect on
-#systemctl start nginx
 
 ## Enable linger for the rhel user
 loginctl enable-linger $USER
