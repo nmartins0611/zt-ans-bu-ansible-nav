@@ -1,106 +1,62 @@
-= Lab Guide: Creating a Collection with the VS Code Extension
-:doctype: book
-:notoc:
-:toc-title: Table of Contents
-:nosectnums:
-:icons: font
+= Lab Guide: Exploring the ansible-navigator Interface
 
-_A guide to using the Ansible extension for Visual Studio Code to scaffold a new Ansible collection and playbook project._
+_A guide to exploring the `ansible-navigator` Textual User Interface (TUI) and its features._
 
 ---
 
-== Lab Briefing
+== Introduction
 
-In this exercise, you will create an Ansible collection and a playbook using the Ansible extension's wizard in Visual Studio Code (VS Code).
-
-When the laboratory environment is ready, you will be able to click the green **Start** button in the bottom right corner.
-
-image::Jun-06-2025_at_21.02.34-image.png[VS Code editor inside the lab environment, opts="border"]
+In this challenge, you will explore the link:https://github.com/ansible/ansible-navigator[`ansible-navigator`] interface and highlight some of its key features for developing and testing Ansible automation. `ansible-navigator` provides a context-aware TUI that integrates with documentation and improves the experience of navigating playbook outputs.
 
 ---
 
-== Lab Guide: Hands-On Tasks
+== Task: Navigating the TUI and Running Playbooks
 
-Welcome to this hands-on introduction to Ansible Development Tools (ADT). You will learn how to create, test, and deploy an Ansible collection using the `ansible-creator` tool through the Ansible extension for VS Code.
+Let's dive into the `ansible-navigator` TUI and try out some commands.
 
-For this lab, all necessary tools and dependencies are pre-installed and configured for you.
-
-=== Task 1: Explore the Ansible Extension
-
-First, get started with the graphical interface for `ansible-creator`, which is a feature of the Ansible extension for VS Code.
-
-.   **Locate and open the Ansible extension** by clicking the Ansible icon in the left sidebar of VS Code. You will see three sections: *Ansible Development Tools*, *Ansible Lightspeed*, and *Ansible Lightspeed Feedback*.
+.   **Launch `ansible-navigator`** by running the command with no options in the integrated terminal:
 +
-image::image.png[Ansible icon in the VS Code sidebar, opts="border"]
-
-.   **Collapse the Lightspeed sections** to simplify the view, as you will be working with *Ansible Development Tools*.
-+
-image::Apr-29-2025_at_13.49.45-image.png[Collapsing the Lightspeed sections, opts="border"]
-
-=== NOTE: The developement tools might indicate they have been updated and you need to reload the VS Code extentions. This can be done by click on reload
-
-=== Task 2: Create a Collection Project
-
-Next, you will scaffold a new Ansible collection.
-
-.   **Open the Collection project creator** by clicking the **Collection project** link in the *Ansible Development Tools* section.
-+
-image::Apr-29-2025_at_13.51.07-image.png[Creating a Collection project, opts="border"]
-
-.   **Fill out the collection details** in the new tab that opens. Use the following information:
-* **Namespace:** `mynamespace`
-* **Collection:** `mycollection`
-* **Init path:**
-+
-[source,sh,role=execute]
+[source,bash]
 ----
-/home/rhel/myansibleproject/collections/ansible_collections/mynamespace/mycollection
+ansible-navigator
 ----
 +
-* **Check** the box for `Install collection from source code (editable mode)`.
-+
-image::image.png[Collection creation form, opts="border"]
+You are now in the `ansible-navigator` TUI. By default, it shows the `:welcome` screen, providing a quick overview of available subcommands. Type `:help` and press Enter for more detailed information.
 
-.   **Create the collection** by clicking the blue **Create** button. After a few moments, you should see the creation details appear in the *Logs* box.
-
-=== Task 3: Create a Playbook Project
-
-Now, you will create a separate playbook project.
-
-.   **Open the Playbook project creator** by clicking the **Playbook project** link in the Ansible extension sidebar.
-+
-image::May-12-2025_at_18.31.56-image.png[Creating a Playbook project, opts="border"]
-
-.   **Fill out the playbook project details** in the new tab. Use the following information:
-* **Destination directory:** `/home/rhel/myansibleproject`
-* **Namespace:** `mynamespace`
-* **Collection:** `mysecondcollection`
-
-.   **Create the project** by clicking the **Create** button. After a couple of seconds, you should see a success message in the logs.
+.   **View module documentation.** Try displaying the documentation for the `ping` module by typing the following subcommand and pressing Enter:
 +
 [source,text]
 ----
---- ansible-creator logs ---
-Note: playbook project created at /home/rhel/myansibleproject
-----
-
-=== Task 4: Open the Collection Folder
-
-Due to a lab infrastructure limitation, you will now manually open the folder where your new collection content was created.
-
-.   **Open the file Explorer** by clicking the Explorer icon (the icon with two files) in the VS Code left sidebar.
-+
-image::Apr-29-2025_at_13.57.13-image.png[VS Code Explorer icon, opts="border"]
-
-.   **Open the collection folder** by clicking the **(1) Open Folder** button. In the path field, paste the following path **(2)** and click the blue **OK** button **(3)**.
-+
-[source,sh,role=execute]
-----
-/home/rhel/myansibleproject/collections/ansible_collections/mynamespace/mycollection/
+:doc ping
 ----
 +
-image::May-12-2025_at_18.45.02-image.png[Opening a folder in VS Code, opts="border"]
+You can scroll through the documentation using the arrow keys. To exit the documentation view (and return to the previous screen), press the `Esc` key. To exit the TUI completely, type `:quit` and press Enter.
 
-.   **View the scaffolded files** once the VS Code screen reloads. You will see the complete directory structure and all the files created by the Ansible extension for your new collection in the left sidebar.
+.   **Run a playbook in TUI mode.** Run your simple `test.yml` playbook again, but this time omit the `-m stdout` option to use the default TUI mode:
 +
-image::May-06-2025_at_21.58.21-image.png[Scaffolded collection files in the Explorer view, opts="border"]
+[source,bash]
+----
+ansible-navigator run ./test.yml
+----
++
+NOTE: You can also run playbooks from *within* the TUI by typing `:run ./test.yml` and pressing Enter.
+
+.   **Explore the playbook results.** The TUI displays the results of the playbook run. You navigate by using the number keys corresponding to lines on the screen and the `Esc` key to go back. **Press the number** corresponding to the play (`[this is just a test]`) to drill down into its tasks. You will see a list of tasks that ran.
+
+.   **Inspect task details and documentation.** Now, **press the number** corresponding to the `Gathering Facts` task (usually `0`). This shows the details for that specific task. From here, you can quickly access the documentation for the module used in the task. Type the subcommand `:doc` and press Enter to view the documentation for the `setup` module (which is used by `gather_facts`). Press `Esc` twice to return to the list of tasks, and `Esc` again to return to the list of plays.
+
+TIP: Wondering how to select a line number greater than 9? Simply prepend the number with a colon (e.g., `:15` selects line 15).
+
+.   **Run subcommands directly from the command line.** You don't always need to enter the TUI first. You can pass subcommands directly. For example, to view the documentation for the `setup` module directly from your shell prompt, exit the TUI (`Esc` until you exit, or `:quit`) and run:
++
+[source,bash]
+----
+ansible-navigator doc setup
+----
+
+Remember, if you ever get lost within the `ansible-navigator` TUI, pressing `Esc` will always take you back to the previous screen. Pressing `Esc` on the main screen will exit the application.
+
+---
+== Next Steps
+
+You have now explored the basic navigation and features of `ansible-navigator`. Press the `Next` button below to proceed to the next challenge.
