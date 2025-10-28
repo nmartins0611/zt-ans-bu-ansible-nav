@@ -2,3 +2,4 @@
 echo "Starting module called module-01" >> /tmp/progress.log
 
 systemctl restart code-server ## force update tools
+su - $USER -c 'rm -rf /home/$USER/test'
